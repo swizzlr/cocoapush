@@ -1,20 +1,10 @@
-lockfile_name = '.server_running_lockfile'
-
 process do |files|
-
   files.delete_if do |file|
     file != 'app.rb'
   end
-
   unless files.empty?
-    if File.exists?(lockfile_name)
-      Process.kill('KILL', File.read(lockfile_name).to_i) rescue nil
-      File.delete(lockfile_name)
-    end
-    pid = Process.spawn('bundle exec ruby ./app.rb webhook_notify_server')
-    Process.detach(pid)
-    File.open(lockfile_name, 'w') { |file| file << pid }
+    p 'KICKER: App.rb changed, running rake task'
+    Process.spawn('rake kick:run_or_restart_server', :out => STDOUT)
     files.delete('app.rb')
   end
-
 end

@@ -3,6 +3,44 @@ task :bootstrap do
   `bundle install`
 end
 
+desc 'Watch for changes and restart server when necessary.'
+task :kick => 'kick:kicker'
+
+namespace :kick do
+  lockfile_name = '.server_running_lockfile'
+
+  task :kicker => :run_or_restart_server do
+    puts 'Starting kicker'
+    Process.exec('bundle exec kicker')
+  end
+
+  task :run_or_restart_server do #all kicking logic is found in the rakefile. because reasons.
+    puts 'Checking for running server...'
+    if File.exists?(lockfile_name)
+      puts 'Killing server...'
+      Process.kill('KILL', File.read(lockfile_name).to_i) rescue nil
+      File.delete(lockfile_name)
+    end
+    puts 'Spawning rake task'
+    pid = Process.spawn('rake run', :out => STDOUT)
+    Process.detach(pid)
+    File.open(lockfile_name, 'w') { |file| file << pid }
+  end
+end
+
+task :run => 'run:production'
+
+namespace :run do
+  #task :develop do
+  #  Process.exec('bundle exec thin start')
+  #end
+
+  task :production do
+    puts 'Starting server...'
+    Process.exec('bundle exec thin start')
+  end
+end
+
 desc 'Fully regenerate push package'
 task :pushpackage => 'pushpackage:zip'
 
