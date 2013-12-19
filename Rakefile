@@ -46,6 +46,7 @@ task :run => 'run:development'
 namespace :run do
   task :generate_keys_from_env do
     unless File.exists? 'certs/org.cocoadocs.push-key.pem'
+      p 'Generating SSL keyfile'
       File.open 'certs/org.cocoadocs.push-key.pem', 'w' do |file|
         file << ENV['SSL_KEY'].unescape
       end
