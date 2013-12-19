@@ -80,8 +80,19 @@ desc 'Fully regenerate push package'
 task :pushpackage => 'pushpackage:zip'
 
 namespace :pushpackage do
+
+  desc 'Generate website.json from .proto'
+  task :website do
+    require 'json'
+
+    website = JSON.parse File.read 'website.json.proto'
+    File.open 'CocoaPods.pushpackage/website.json', 'w' do |file|
+      file << JSON.generate(website)
+    end
+  end
+
   desc 'Regenerate manifest.json'
-  task :manifest do
+  task :manifest => :website do
     require 'openssl'
     require 'json'
 
@@ -91,7 +102,7 @@ namespace :pushpackage do
       manifest = Hash.new
       # create manifest hash
       file_paths = Dir['**/*']
-      file_paths.delete_if { |path| Dir.exists? path || path == 'signature' }
+      file_paths.delete_if { |path| Dir.exists? path || path == 'signature' || path == '*.proto' }
       file_paths.each do |filename|
         digest = OpenSSL::Digest::SHA1.new(File.read(filename))
         manifest[filename] = digest.to_s
@@ -129,7 +140,7 @@ namespace :pushpackage do
   end
 
   desc 'Zip pushpackage folder'
-  task :zip => [:manifest, :sign] do
+  task :zip => [:website, :manifest, :sign] do
     require 'zip'
     File.delete('CocoaPods.pushpackage.zip')
     Zip::File.open('CocoaPods.pushpackage.zip', Zip::File::CREATE) do |package|

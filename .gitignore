@@ -1,5 +1,6 @@
 certs/*key*
 **/manifest.json
 **/signature
+**/website.json
 .server_running_lockfile
 .env

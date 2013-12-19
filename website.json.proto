@@ -1,0 +1,8 @@
+{
+    "websiteName": "CocoaPods",
+    "websitePushID": "web.org.cocoapods.push",
+    "allowedDomains": ["http://localhost:4567"],
+    "urlFormatString": "http://%@",
+    "authenticationToken": "I<3LISALUEDDECKE",
+    "webServiceURL": "https://localhost:3000/push"
+}
