@@ -142,7 +142,13 @@ namespace :pushpackage do
   desc 'Zip pushpackage folder'
   task :zip => [:website, :manifest, :sign] do
     require 'zip'
-    File.delete('CocoaPods.pushpackage.zip')
+
+    p 'Regenerating pushpackage'
+
+    if File.exists?('CocoaPods.pushpackage.zip') then
+      p 'Deleting package'
+      File.delete('CocoaPods.pushpackage.zip')
+    end
     Zip::File.open('CocoaPods.pushpackage.zip', Zip::File::CREATE) do |package|
       Dir.chdir 'CocoaPods.pushpackage' do |dir|
         Dir['**/*'].each { |file| package.add file, File.expand_path(file) unless Dir.exists? file }
