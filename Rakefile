@@ -10,6 +10,7 @@ task :generate_env do
     env << 'SSL_CERT=' + File.read('certs/org.cocoadocs.push-key.pem').dump[1..-2] + "\n"
     env << 'APPLE_KEY=' + File.read('certs/web.org.cocoapods.push-key.pem').dump[1..-2] + "\n"
     env << 'APPLE_CERT=' + File.read('certs/web.org.cocoapods.push-cert.pem').dump[1..-2] + "\n"
+    env << 'PORT=' + 9578.to_s
   end
 end
 
@@ -46,8 +47,9 @@ namespace :run do
   end
 
   task :production do
-    puts 'Starting server...'
-    Process.exec('bundle exec thin --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment production start')
+    port = ENV['PORT'] || 3000.to_s
+    puts 'Starting server on port... ' + port
+    Process.exec("bundle exec thin --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment production -p #{port}  start")
   end
 end
 
