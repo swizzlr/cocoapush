@@ -48,13 +48,20 @@ namespace :run do
     unless File.exists? 'certs/org.cocoadocs.push-key.pem'
       p 'Generating SSL keyfile'
       File.open 'certs/org.cocoadocs.push-key.pem', 'w' do |file|
-        file << ENV['SSL_KEY'].unescape
+        p 'Loading key...'
+        key = ENV['SSL_KEY'].unescape
+        p key
+        file << key
       end
     end
 
     unless File.exists? 'certs/web.org.cocoapods.push-key.pem'
+      p 'Generating APNS keyfile'
       File.open 'certs/web.org.cocoapods.push-key.pem', 'w' do |file|
-        file << ENV['APPLE_KEY'].unescape
+        p 'Loading key...'
+        key = ENV['APPLE_KEY'].unescape
+        p key
+        file << key
       end
     end
   end
