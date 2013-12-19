@@ -1,5 +1,7 @@
 require 'sinatra/base'
+require 'sinatra/streaming'
 require 'thin'
+require 'json'
 
 class CocoaPush < Sinatra::Base
   set :threaded, true
@@ -9,6 +11,7 @@ class CocoaPush < Sinatra::Base
     def request_headers
       env.inject({}){|acc, (k,v)| acc[$1.downcase] = v if k =~ /^http_(.*)/i; acc}
     end
+    Sinatra::Streaming
   end
 
   post "/github-webhook" do
@@ -20,7 +23,11 @@ class CocoaPush < Sinatra::Base
   website_push_id = 'web.org.cocoapods.push'
 
   post "/#{notif_extension_subroute}/#{version}/pushPackages/#{website_push_id}" do
-    return "hey"
+    stream do |zip|
+      zip << File.read('./CocoaPods.pushpackage.zip')
+    end
+    response['Content-Type'] = 'application/zip'
+    return 200
     #return push package with user ID and store user ID to db
   end
 
@@ -33,9 +40,9 @@ class CocoaPush < Sinatra::Base
   end
 
   post "/#{notif_extension_subroute}/#{version}/log" do
-    p '!!!ERROR!!!'
-    JSON.parse(request.body.read)['logs'].each { |error| p error }
-    p
+    errors = JSON.parse(request.body.read)['logs']
+    logger.warn "Got #{errors.count} errors from Safari:"
+    errors.each { |error| logger.warn error }
     return 500
   end
 
