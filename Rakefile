@@ -71,7 +71,7 @@ namespace :run do
   end
 
   desc 'Start server in production mode without SSL for heroku'
-  task :production => :generate_keys_from_env do
+  task :production => [:generate_keys_from_env, :pushpackage] do
     Process.exec("bundle exec thin --environment production -p #{get_port} start")
   end
 end
