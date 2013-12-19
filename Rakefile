@@ -16,7 +16,7 @@ task :generate_env do
     env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
   end
   `heroku config:push -o`
-  `heroku config:set WEBSERVICE_URL=https://cocoapush.herokuapps.com/push`
+  `heroku config:set WEBSERVICE_URL=https://cocoapush.herokuapp.com/push`
 end
 
 desc 'Watch for changes and restart server when necessary.'
