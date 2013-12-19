@@ -7,6 +7,9 @@ desc 'Generate .env file from private keys'
 task :generate_env do
   File.open '.env', 'w' do |env|
     env << 'SSL_KEY=' + File.read('certs/org.cocoadocs.push-key.pem').dump[1..-2] + "\n"
+    env << 'SSL_CERT=' + File.read('certs/org.cocoadocs.push-key.pem').dump[1..-2] + "\n"
+    env << 'APPLE_KEY=' + File.read('certs/web.org.cocoapods.push-key.pem').dump[1..-2] + "\n"
+    env << 'APPLE_CERT=' + File.read('certs/web.org.cocoapods.push-cert.pem').dump[1..-2] + "\n"
   end
 end
 
