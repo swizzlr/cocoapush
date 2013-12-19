@@ -20,7 +20,6 @@ class CocoaPush < Sinatra::Base
   website_push_id = 'web.org.cocoapods.push'
 
   post "/#{notif_extension_subroute}/#{version}/pushPackages/#{website_push_id}" do
-    p eval %Q{"#{ENV['SSL_KEY']}"}
     return "hey"
     #return push package with user ID and store user ID to db
   end
@@ -48,14 +47,5 @@ class CocoaPush < Sinatra::Base
     #update settings for device token
   end
 
-  #self.run! do |server|
-    #ssl_options = {
-      #:cert_chain_file => 'certs/org.cocoadocs.push-cert.pem',
-      #:private_key_file => 'certs/org.cocoadocs.push-key.pem',
-      #:verify_peer => false
-    #}
-    #server.ssl = true
-    #server.ssl_options = ssl_options
-  #end
 end
 
