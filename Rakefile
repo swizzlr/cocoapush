@@ -5,15 +5,18 @@ task :bootstrap do
   `bundle install`
 end
 
-desc 'Generate .env file from private keys'
+desc 'Generate .env file from private keys and sync to heroku'
 task :generate_env do
   File.open '.env', 'w' do |env|
     env << 'SSL_KEY=' + File.read('certs/org.cocoadocs.push-key.pem').escape + "\n"
     env << 'SSL_CERT=' + File.read('certs/org.cocoadocs.push-key.pem').escape + "\n"
     env << 'APPLE_KEY=' + File.read('certs/web.org.cocoapods.push-key.pem').escape + "\n"
     env << 'APPLE_CERT=' + File.read('certs/web.org.cocoapods.push-cert.pem').escape + "\n"
-    env << 'PORT=' + 9578.to_s
+    env << 'PORT=' + 9578.to_s + "\n"
+    env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
   end
+  `heroku config:push -o`
+  `heroku config:set WEBSERVICE_URL=https://cocoapush.herokuapps.com/push`
 end
 
 desc 'Watch for changes and restart server when necessary.'
@@ -93,6 +96,9 @@ namespace :pushpackage do
     require 'json'
 
     website = JSON.parse File.read 'website.json.proto'
+
+    website['webServiceURL'] = ENV['WEBSERVICE_URL'] || website['webServiceURL']
+
     File.open 'CocoaPods.pushpackage/website.json', 'w' do |file|
       file << JSON.generate(website)
     end
