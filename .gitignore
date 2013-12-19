@@ -2,3 +2,4 @@ certs/*key*
 **/manifest.json
 **/signature
 .server_running_lockfile
+.env

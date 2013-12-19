@@ -3,6 +3,13 @@ task :bootstrap do
   `bundle install`
 end
 
+desc 'Generate .env file from private keys'
+task :generate_env do
+  File.open '.env', 'w' do |env|
+    env << 'SSL_KEY=' + File.read('certs/org.cocoadocs.push-key.pem').dump[1..-2] + "\n"
+  end
+end
+
 desc 'Watch for changes and restart server when necessary.'
 task :kick => 'kick:kicker'
 
@@ -28,16 +35,16 @@ namespace :kick do
   end
 end
 
-task :run => 'run:production'
+task :run => 'run:development'
 
 namespace :run do
-  #task :develop do
-  #  Process.exec('bundle exec thin start')
-  #end
+  task :develop do
+    Process.exec('bundle exec thin --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment development start')
+  end
 
   task :production do
     puts 'Starting server...'
-    Process.exec('bundle exec thin start')
+    Process.exec('bundle exec thin --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment production start')
   end
 end
 

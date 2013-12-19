@@ -77,7 +77,7 @@
     </object>
     <object type="LMREQUEST" id="z105">
         <attribute name="uuid" type="string">468F9BFD-F74C-4459-9E21-C3430A469B1B</attribute>
-        <attribute name="url" type="string">http://localhost:3000/push/v1/pushPackages/web.org.cocoapods.push</attribute>
+        <attribute name="url" type="string">https://localhost:3000/push/v1/pushPackages/web.org.cocoapods.push</attribute>
         <attribute name="timeoutinterval" type="float">30</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>
         <attribute name="redirectauthorization" type="bool">0</attribute>

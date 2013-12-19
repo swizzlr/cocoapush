@@ -2,7 +2,7 @@ require 'sinatra/base'
 require 'thin'
 
 class CocoaPush < Sinatra::Base
-  set :server, 'thin'
+  set :threaded, true
   enable :logging
 
   helpers do #ripped from http://wbear.wordpress.com/2010/03/20/sinatra-request-headers-helper/ (WHAT IS WRONG WITH THIS FRICKEN APP FRAMEWORK)
@@ -20,6 +20,7 @@ class CocoaPush < Sinatra::Base
   website_push_id = 'web.org.cocoapods.push'
 
   post "/#{notif_extension_subroute}/#{version}/pushPackages/#{website_push_id}" do
+    p eval %Q{"#{ENV['SSL_KEY']}"}
     return "hey"
     #return push package with user ID and store user ID to db
   end
