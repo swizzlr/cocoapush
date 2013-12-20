@@ -1,10 +1,10 @@
 process do |files|
   files.delete_if do |file|
-    file != 'app.rb'
+    file != 'app.rb' && file != 'helpers.rb' && file != 'config.ru'
   end
   unless files.empty?
-    p 'KICKER: App.rb changed, running rake task'
+    p "KICKER: #{files} changed, running rake task"
     Process.spawn('rake kick:run_or_restart_server', :out => STDOUT)
-    files.delete('app.rb')
+    files = nil
   end
 end
