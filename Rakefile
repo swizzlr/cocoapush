@@ -2,7 +2,10 @@ require './helpers.rb'
 
 desc 'Bundle what?'
 task :bootstrap do
-  `bundle install`
+  if `which postgres`.strip.empty? then
+    p 'Postgres not installed, please `brew install postgresql`, bundle install will now fail'
+  end
+  Process.exec('bundle install')
 end
 
 desc 'Flush memcache'
