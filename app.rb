@@ -1,3 +1,4 @@
+require './helpers.rb'
 require 'sinatra/base'
 require 'sinatra/streaming'
 require 'thin'
@@ -18,11 +19,7 @@ class CocoaPush < Sinatra::Base
     # make a webhook happen
   end
 
-  version = 'v1'
-  notif_extension_subroute = 'push'
-  website_push_id = 'web.org.cocoapods.push'
-
-  post "/#{notif_extension_subroute}/#{version}/pushPackages/#{website_push_id}" do
+  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/pushPackages/#{WEBSITE_PUSH_ID}" do
     stream do |zip|
       zip << File.read('./CocoaPods.pushpackage.zip')
     end
@@ -31,26 +28,26 @@ class CocoaPush < Sinatra::Base
     #return push package with user ID and store user ID to db
   end
 
-  post "/#{notif_extension_subroute}/#{version}/devices/:device_token/registrations/#{website_push_id}" do
+  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #register device token for user ID
   end
 
-  delete "/#{notif_extension_subroute}/#{version}/devices/:device_token/registrations/#{website_push_id}" do
+  delete "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #unregister device token and delete user ID
   end
 
-  post "/#{notif_extension_subroute}/#{version}/log" do
+  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/log" do
     errors = JSON.parse(request.body.read)['logs']
     logger.warn "Got #{errors.count} errors from Safari:"
     errors.each { |error| logger.warn error }
     return 500
   end
 
-  get "/#{notif_extension_subroute}/#{version}/settingsForDeviceToken" do
+  get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
     #return settings for device token
   end
 
-  post "/#{notif_extension_subroute}/#{version}/settingsForDeviceToken" do
+  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
     #update settings for device token
   end
 

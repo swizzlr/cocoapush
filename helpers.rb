@@ -7,3 +7,8 @@ class String
    eval %Q{"#{self}"}
  end
 end
+
+HEROKU_WEBSERVICE_URL = 'https://cocoapush.herokuapp.com/push'
+VERSION = 'v1'
+NOTIF_EXTENSION_SUBROUTE = 'push'
+WEBSITE_PUSH_ID = 'web.org.cocoapods.push'
