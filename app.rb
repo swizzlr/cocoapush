@@ -8,6 +8,10 @@ class CocoaPush < Sinatra::Base
   set :threaded, true
   enable :logging
 
+  set :static, true
+  set :static_cache_control, true
+
+
   helpers do #ripped from http://wbear.wordpress.com/2010/03/20/sinatra-request-headers-helper/ (WHAT IS WRONG WITH THIS FRICKEN APP FRAMEWORK)
     def request_headers
       env.inject({}){|acc, (k,v)| acc[$1.downcase] = v if k =~ /^http_(.*)/i; acc}
@@ -20,12 +24,13 @@ class CocoaPush < Sinatra::Base
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/pushPackages/#{WEBSITE_PUSH_ID}" do
-    stream do |zip|
-      zip << File.read('./CocoaPods.pushpackage.zip')
-    end
-    response['Content-Type'] = 'application/zip'
-    return 200
+    redirect to('/pushpackage')
     #return push package with user ID and store user ID to db
+  end
+
+  get "/pushpackage" do
+    cache_control :public, max_age: 10000000
+    send_file './CocoaPods.pushpackage.zip'
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
@@ -44,7 +49,7 @@ class CocoaPush < Sinatra::Base
   end
 
   get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
-    #return settings for device token
+
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
