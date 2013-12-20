@@ -20,9 +20,11 @@ task :generate_env do
     env << 'APPLE_CERT=' + File.read('certs/web.org.cocoapods.push-cert.pem').escape + "\n"
     env << 'PORT=' + 9578.to_s + "\n"
     env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
+    env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
   end
   `heroku config:push -o`
   `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
+  `heroku config:unset MEMCACHE_SERVERS`
 end
 
 desc 'Watch for changes and restart server when necessary.'
