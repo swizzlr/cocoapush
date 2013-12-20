@@ -5,6 +5,12 @@ task :bootstrap do
   `bundle install`
 end
 
+desc 'Flush memcache'
+task :flush do
+  require 'dalli'
+  Dalli::Client.new.flush_all
+end
+
 desc 'Generate .env file from private keys and sync to heroku'
 task :generate_env do
   File.open '.env', 'w' do |env|
@@ -86,8 +92,8 @@ namespace :run do
   end
 end
 
-desc 'Fully regenerate push package'
-task :pushpackage => 'pushpackage:zip'
+desc 'Fully regenerate push package and ensure caches are flushed'
+task :pushpackage => ['pushpackage:zip', :flush]
 
 namespace :pushpackage do
 
