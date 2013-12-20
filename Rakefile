@@ -8,6 +8,7 @@ end
 desc 'Flush memcache'
 task :flush do
   require 'dalli'
+  require 'memcachier'
   Dalli::Client.new.flush_all
 end
 
