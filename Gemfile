@@ -9,6 +9,7 @@ gem 'thin'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'pg'
+gem 'rack-cache'
 
 group :development do
   gem 'kicker'
