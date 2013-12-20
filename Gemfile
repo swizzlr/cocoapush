@@ -10,6 +10,8 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'pg'
 gem 'rack-cache'
+gem 'dalli'
+gem 'memcachier'
 
 group :development do
   gem 'kicker'
