@@ -1,6 +1,5 @@
 require './helpers.rb'
 require 'sinatra/base'
-require 'sinatra/streaming'
 require 'thin'
 require 'json'
 
@@ -16,7 +15,6 @@ class CocoaPush < Sinatra::Base
     def request_headers
       env.inject({}){|acc, (k,v)| acc[$1.downcase] = v if k =~ /^http_(.*)/i; acc}
     end
-    Sinatra::Streaming
   end
 
   post "/github-webhook" do
