@@ -1,13 +1,12 @@
 source 'https://rubygems.org'
 
-ruby '2.0.0'
+ruby '2.1.0', :engine => "rbx", :engine_version => "2.2.1"
 
-#ruby=ruby-2.0.0
-#ruby-gemset=cocoapush
+gem 'rubysl'
+gem 'rubysl-json'
 
 gem 'thin'
 gem 'sinatra'
-gem 'sinatra-contrib'
 gem 'pg'
 gem 'rack-cache'
 gem 'dalli'
