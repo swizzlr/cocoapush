@@ -3,7 +3,13 @@ require './helpers.rb'
 desc 'Bundle what?'
 task :bootstrap do
   if `which postgres`.strip.empty? then
-    p 'Postgres not installed, please `brew install postgresql`, bundle install will now fail'
+    p 'Postgres not installed, installing now. Install postgres.app for use, do not add to launchctl.'
+    `brew install postgresql`
+  end
+
+  if `which memcached`.strip.empty? then
+    p 'Memcache not installed, installing now. BE SURE TO FOLLOW CAVEATS AND ADD TO LAUNCHCTL'
+    `brew install memcached`
   end
   Process.exec('bundle install')
 end
