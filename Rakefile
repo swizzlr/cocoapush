@@ -4,14 +4,21 @@ desc 'Bundle what?'
 task :bootstrap do
   if `which postgres`.strip.empty? then
     p 'Postgres not installed, installing now. Install postgres.app for use, do not add to launchctl.'
-    `brew install postgresql`
+    p `brew install postgresql`
   end
 
   if `which memcached`.strip.empty? then
     p 'Memcache not installed, installing now. BE SURE TO FOLLOW CAVEATS AND ADD TO LAUNCHCTL'
-    `brew install memcached`
+    p `brew install memcached`
   end
+
+  if `which heroku`.strip.empty? then
+    p 'Heroku toolbelt not installed, taking you to the webpage for it.'
+    `open https://toolbelt.heroku.com`
+  end
+
   Process.exec('bundle install')
+
 end
 
 namespace :stress do
@@ -44,12 +51,19 @@ task :generate_env do
     env << 'PORT=' + 9578.to_s + "\n"
     env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
     env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
-    env << 'NEW_RELIC_APP_NAME="CocoaPush"' + "\n"
+    env << 'NEW_RELIC_APP_NAME=CocoaPush' + "\n"
     env << "RACK_ENV=production\n"
   end
-  `heroku config:push -o`
-  `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
-  `heroku config:unset MEMCACHE_SERVERS`
+
+  `heroku help config:push`
+  if $?.exitstatus != 0 then
+    p "You didn\'t have heroku-config installed, installing now."
+    p `heroku plugins:install git://github.com/ddollar/heroku-config.git`
+  end
+
+  p `heroku config:push -o`
+  p `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
+  p `heroku config:unset MEMCACHE_SERVERS`
 
 end
 
