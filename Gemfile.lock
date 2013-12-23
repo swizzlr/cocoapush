@@ -14,6 +14,7 @@ GEM
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
     memcachier (0.0.2)
+    newrelic_rpm (3.7.1.180)
     notify (0.5.2)
     pg (0.17.1)
     rack (1.5.2)
@@ -247,6 +248,7 @@ DEPENDENCIES
   dalli
   kicker
   memcachier
+  newrelic_rpm
   pg
   rack-cache
   rubysl

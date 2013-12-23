@@ -4,12 +4,17 @@ require 'thin'
 require 'json'
 
 class CocoaPush < Sinatra::Base
+  configure :production do
+    require 'newrelic_rpm'
+  end
+
   set :threaded, true
   enable :logging
 
   set :static, true
   set :static_cache_control, true
 
+  p "Sinatra is starting with Rack env: #{ENV['RACK_ENV']}"
 
   helpers do #ripped from http://wbear.wordpress.com/2010/03/20/sinatra-request-headers-helper/ (WHAT IS WRONG WITH THIS FRICKEN APP FRAMEWORK)
     def request_headers

@@ -16,4 +16,6 @@ group :development do
   gem 'kicker'
 end
 
+gem 'newrelic_rpm'
+
 gem 'rubyzip'
