@@ -14,6 +14,19 @@ task :bootstrap do
   Process.exec('bundle install')
 end
 
+namespace :stress do
+
+  desc 'Stress test with apache bench'
+  task :ab do
+    Process.exec 'ab -p /dev/null -c 100 -n 1000 https://cocoapush.herokuapp.com/push/v1/pushPackages/web.org.cocoapods.push'
+  end
+
+  desc 'Stress test with siege'
+  task :siege do
+    Process.exec 'siege'
+  end
+end
+
 desc 'Flush memcache'
 task :flush do
   require 'dalli'
@@ -31,10 +44,13 @@ task :generate_env do
     env << 'PORT=' + 9578.to_s + "\n"
     env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
     env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
+    env << 'NEW_RELIC_APP_NAME="CocoaPush"' + "\n"
+    env << "RACK_ENV=production\n"
   end
   `heroku config:push -o`
   `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
   `heroku config:unset MEMCACHE_SERVERS`
+
 end
 
 desc 'Watch for changes and restart server when necessary.'
