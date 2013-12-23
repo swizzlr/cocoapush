@@ -25,7 +25,7 @@ namespace :stress do
 
   desc 'Stress test with apache bench'
   task :ab do
-    Process.exec 'ab -p /dev/null -c 100 -n 1000 https://cocoapush.herokuapp.com/push/v1/pushPackages/web.org.cocoapods.push'
+    Process.exec 'ab -c 100 -n 10000 https://cocoapush.herokuapp.com/pushpackage'
   end
 
   desc 'Stress test with siege'
@@ -125,12 +125,12 @@ namespace :run do
 
   desc 'Start server with SSL and dev environment'
   task :development => :generate_keys_from_env do
-    Process.exec("bundle exec thin --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment development -p #{get_port} start")
+    Process.exec("bundle exec thin --threaded --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment development -p #{get_port} start")
   end
 
   desc 'Start server in production mode without SSL for heroku'
   task :production => [:generate_keys_from_env, :pushpackage] do
-    Process.exec("bundle exec thin --environment production -p #{get_port} start")
+    Process.exec("bundle exec thin --threaded --environment production -p #{get_port} start")
   end
 end
 
