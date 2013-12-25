@@ -1,6 +1,5 @@
 require './helpers.rb'
 require 'sinatra/base'
-require 'thin'
 require 'json'
 
 class CocoaPush < Sinatra::Base
@@ -8,11 +7,8 @@ class CocoaPush < Sinatra::Base
     require 'newrelic_rpm'
   end
 
-  set :threaded, true
-  enable :logging
-
-  set :static, true
-  set :static_cache_control, true
+  enable :threaded
+  set :server, 'puma'
 
   p "Sinatra is starting with Rack env: #{ENV['RACK_ENV']}"
 
