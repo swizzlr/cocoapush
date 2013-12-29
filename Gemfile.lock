@@ -131,7 +131,7 @@ GEM
     rubysl-coverage (2.0.3)
     rubysl-csv (2.0.2)
       rubysl-english (~> 2.0)
-    rubysl-curses (2.0.0)
+    rubysl-curses (2.0.1)
     rubysl-date (2.0.6)
     rubysl-delegate (2.0.1)
     rubysl-digest (2.0.3)
@@ -231,6 +231,10 @@ GEM
     rubysl-yaml (2.0.4)
     rubysl-zlib (2.0.1)
     rubyzip (1.1.0)
+    sequel (4.5.0)
+    sequel_pg (1.6.8)
+      pg (>= 0.8.0)
+      sequel (>= 3.39.0)
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -251,4 +255,6 @@ DEPENDENCIES
   rubysl
   rubysl-json
   rubyzip
+  sequel
+  sequel_pg
   sinatra
