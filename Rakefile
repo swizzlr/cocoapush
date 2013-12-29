@@ -21,16 +21,55 @@ task :bootstrap do
 
 end
 
+desc 'Print usage of stress target'
+task :stress => 'stress:usage'
+
 namespace :stress do
 
+  targets = {
+    :heroku   =>  'https://cocoapush.herokuapp.com',
+    :local    =>  'http://localhost:3000',
+    :localssl =>  'https://localhost:3000',
+    :foreman  =>  'http://localhost:9578'
+  }
+
+  paths = {
+    :pushpackage      =>  [:POST,   '/push/v1/pushPackages/web.org.cocoapods.push'],
+    :get_pushpackage  =>  [:GET,    '/pushpackage'],
+    :register         =>  [:POST,   '/push/v1/devices/DEVICE_TOKEN_GOES_HERE/registrations/web.org.cocoapods.push'],
+    :unregister       =>  [:DELETE, '/push/v1/devices/DEVICE_TOKEN_GOES_HERE/registrations/web.org.cocoapods.push'],
+    :get_settings     =>  [:GET,    '/push/v1/settingsForDeviceToken'],
+    :post_settings    =>  [:POST,   '/push/v1/settingsForDeviceToken']
+  }
+
+  default_target = :heroku
+  default_path = :pushpackage
+
+  desc 'Print usage of stress target'
+  task :usage do
+    p 'rake stress:[ab|siege][target, paths]'
+    p 'Targets:'
+    p "Default target #{:heroku}"
+    p targets
+    p 'Paths:'
+    p "Default path #{:pushpackage}"
+    p paths
+    p
+  end
+
   desc 'Stress test with apache bench'
-  task :ab do
-    Process.exec 'ab -c 100 -n 10000 https://cocoapush.herokuapp.com/pushpackage'
+  task :ab, :target, :path do |t, args|
+    target = targets[:"#{args.target}"] || targets[default_target]
+    path = paths[:"#{args.path}"] || paths[default_path]
+    Process.exec p "ab #{if path[0] == :POST then '-p /dev/null' else '' end} -c 100 -n 10000 #{target}#{path[1]}"
   end
 
   desc 'Stress test with siege'
-  task :siege do
-    Process.exec 'siege'
+  task :siege, :target, :path do |t, args|
+    target = targets[:"#{args.target}"] || targets[default_target]
+    path = paths[:"#{args.path}"] || paths[default_path]
+    if path[0] == :POST then p 'Siege won\'t POST for you' ; exit -1 end
+    Process.exec p "siege -c 100 -r 10000 #{target}#{path[1]}"
   end
 end
 
@@ -125,12 +164,12 @@ namespace :run do
 
   desc 'Start server with SSL and dev environment'
   task :development => :generate_keys_from_env do
-    Process.exec("bundle exec thin --threaded --ssl --ssl-key-file certs/org.cocoadocs.push-key.pem --ssl-cert-file certs/org.cocoadocs.push-cert.pem --environment development -p #{get_port} start")
+    Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/org.cocoadocs.push-key.pem'}&cert=#{File.expand_path './certs/org.cocoadocs.push-cert.pem'}\'"
   end
 
   desc 'Start server in production mode without SSL for heroku'
   task :production => [:generate_keys_from_env, :pushpackage] do
-    Process.exec("bundle exec thin --threaded --environment production -p #{get_port} start")
+    Process.exec p "bundle exec puma --environment production -t 25:200 -p #{get_port}"
   end
 end
 
