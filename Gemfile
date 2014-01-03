@@ -15,6 +15,10 @@ gem 'sequel'
 gem 'pg'
 gem 'sequel_pg'
 
+gem 'mongo'
+gem 'bson_ext'
+gem 'mongoid'
+
 group :development do
   gem 'kicker'
 end
