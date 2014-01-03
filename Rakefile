@@ -3,9 +3,12 @@ require './helpers.rb'
 desc 'Bundle what?'
 task :bootstrap do
   if `which postgres`.strip.empty? then
-    p 'Postgres not installed, installing now. Install postgres.app for use, do not add to launchctl.'
-    p `brew install postgresql`
+    p 'Postgres not installed. Install postgres.app and add to path.'
+    abort
+    #p `brew install postgresql`
   end
+
+  p `gem install pg -- --with-pg-config=/Applications/Postgres93.app/Contents/MacOS/bin/pg_config`
 
   if `which memcached`.strip.empty? then
     p 'Memcache not installed, installing now. BE SURE TO FOLLOW CAVEATS AND ADD TO LAUNCHCTL'
@@ -92,6 +95,7 @@ task :generate_env do
     env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
     env << 'NEW_RELIC_APP_NAME=CocoaPush' + "\n"
     env << "RACK_ENV=production\n"
+    env << 'DATABASE_URL=postgres://postgres@localhost/cocoapush' + "\n"
   end
 
   `heroku help config:push`
@@ -103,6 +107,7 @@ task :generate_env do
   p `heroku config:push -o`
   p `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
   p `heroku config:unset MEMCACHE_SERVERS`
+  p `heroku config:unset DATABASE_URL`
 
 end
 
@@ -171,6 +176,11 @@ namespace :run do
   task :production => [:generate_keys_from_env, :pushpackage] do
     Process.exec p "bundle exec puma --environment production -t 25:200 -p #{get_port}"
   end
+end
+
+desc 'Run sequel connected either locally or remoteley'
+task :sequel do
+  Process.exec p "bundle exec sequel #{ENV['DATABASE_URL'] || 'postgres://swizzlr@localhost/cocoapush'}"
 end
 
 desc 'Fully regenerate push package and ensure caches are flushed'
