@@ -130,7 +130,7 @@ namespace :kick do
       File.delete(lockfile_name)
     end
     puts 'Spawning rake task'
-    pid = Process.spawn('rake run', :out => STDOUT)
+    pid = Process.spawn('rake run:dev_no_ssl', :out => STDOUT)
     Process.detach(pid)
     File.open(lockfile_name, 'w') { |file| file << pid }
   end
@@ -170,6 +170,10 @@ namespace :run do
   desc 'Start server with SSL and dev environment'
   task :development => :generate_keys_from_env do
     Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/org.cocoadocs.push-key.pem'}&cert=#{File.expand_path './certs/org.cocoadocs.push-cert.pem'}\'"
+  end
+
+  task :dev_no_ssl do
+    Process.exec p "bundle exec puma --environment development -p #{get_port}"
   end
 
   desc 'Start server in production mode without SSL for heroku'
