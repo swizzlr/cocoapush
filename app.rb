@@ -2,6 +2,11 @@ require './helpers.rb'
 require 'sinatra/base'
 require 'json'
 
+require 'mongo'
+Mongo_Client = Mongo::MongoClient.new("localhost", 27017, :pool_size => 50, :pool_timeout => 5)
+DB = Mongo_Client.db('cocoapush')
+Users = DB.collection('users')
+
 class CocoaPush < Sinatra::Base
   configure :production do
     require 'newrelic_rpm'
@@ -23,8 +28,8 @@ class CocoaPush < Sinatra::Base
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/pushPackages/#{WEBSITE_PUSH_ID}" do
-    redirect to('/pushpackage')
     #return push package with user ID and store user ID to db
+    redirect to('/pushpackage')
   end
 
   get "/pushpackage" do
@@ -34,10 +39,16 @@ class CocoaPush < Sinatra::Base
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #register device token for user ID
+    Users.insert( {
+      device_token: params[:device_token]
+    } )
   end
 
   delete "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #unregister device token and delete user ID
+    Users.remove( {
+      device_token: params[:device_token]
+    } )
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/log" do
@@ -47,12 +58,25 @@ class CocoaPush < Sinatra::Base
     return 500
   end
 
-  get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
+  get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
+    result = Users.find_one( { device_token: params[:device_token] } )
+    result[:settings] unless result == nil
 
   end
 
-  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken" do
-    #update settings for device token
+  post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
+    Users.update( { device_token: params[:device_token] }, { settings: request.body.read } )
+  end
+
+  def validate_incoming_json_settings(str)
+    json = JSON.parse str
+    if (json.class == Hash)
+      if !json[:pods] || json[:pods].class == Array
+        if !json[:terms] || json[:terms].class == Array
+          return true
+        end
+      end
+    end
   end
 
 end
