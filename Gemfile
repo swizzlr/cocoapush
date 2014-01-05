@@ -21,6 +21,7 @@ gem 'mongoid'
 
 group :development do
   gem 'kicker'
+  gem 'rake'
 end
 
 gem 'newrelic_rpm'
