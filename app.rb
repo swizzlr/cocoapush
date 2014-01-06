@@ -6,7 +6,7 @@ require 'mongo'
 require 'uri'
 
 ENV['MONGODB_URI'] = ENV['MONGOHQ_URL']
-db_name = ENV['MONGODB_URI'].path.gsub(/^\//, '') rescue nil
+db_name = URI.parse(ENV['MONGODB_URI']).path.gsub(/^\//, '') rescue nil
 
 Mongo_Client = Mongo::MongoClient.new(:pool_size => 50, :pool_timeout => 5)
 DB = Mongo_Client.db(db_name || 'cocoapush')
