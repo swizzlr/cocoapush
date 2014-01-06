@@ -68,15 +68,15 @@ class CocoaPush < Sinatra::Base
   end
 
   get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
-    result = Users.find_one( { device_token: params[:device_token] } )
-    result[:settings] unless result == nil
+    result = Users.find_one( { _id: params[:device_token] } )['settings'] rescue nil
+    return JSON.generate(result) if result
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
     Users.update(
       { _id: params[:device_token] },
-      { settings: request.body.read }
-    )
+      { settings: { pods: params[:pods] } }
+    ) if params[:pods]
   end
 
   def validate_incoming_json_settings(str)
