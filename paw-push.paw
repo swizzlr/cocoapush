@@ -244,12 +244,12 @@
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">POST</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="body" type="string"></attribute>
+        <attribute name="body" type="string">["{\\n\\t\\"pods\\" : [\\n\\t\\t\\"AFNetworking\\",\\n\\t\\t\\"ReactiveCocoa\\"\\n\\t]\\n}"]</attribute>
         <attribute name="order" type="int64">1</attribute>
         <attribute name="name" type="string">Update Settings</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM" idrefs="z126"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z128 z131"></relationship>
+        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z131 z128"></relationship>
     </object>
     <object type="LMREQUEST" id="z133">
         <attribute name="uuid" type="string">0AA77DE2-141E-4D32-9A66-4524EEA257A3</attribute>
