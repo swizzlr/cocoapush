@@ -5,6 +5,6 @@ process do |files|
   unless files.empty?
     p "KICKER: #{files} changed, running rake task"
     Process.spawn('rake kick:run_or_restart_server', :out => STDOUT)
-    files = nil
+    files.delete_if {|file| true }
   end
 end
