@@ -1,7 +1,7 @@
 #Serves Safari Push Notifications for CocoaPods Users
 
 ##Public-ish API
-Two methods to update and retrieve. These are dumb and perform no validation, yet. They just send back whatever you've previously stored or overwrite/store whatever you send.
+Two methods to update and retrieve. These are dumb and perform little to no validation, yet. They just send back whatever you've previously stored that the app knows about: right now, that's an object with a 'pods' key.
 
 `GET /push/v1/settingsForDeviceToken/:device_token`
 
