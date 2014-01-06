@@ -2,13 +2,10 @@ require './helpers.rb'
 
 desc 'Bundle what?'
 task :bootstrap do
-  if `which postgres`.strip.empty? then
-    p 'Postgres not installed. Install postgres.app and add to path.'
-    abort
-    #p `brew install postgresql`
+  if `which mongo`.strip.empty? then
+    p 'MongoDB not installed, installing now. BE SURE TO FOLLOW CAVEATS AND ADD TO LAUNCHCTL'
+    p `brew install mongodb`
   end
-
-  p `gem install pg -- --with-pg-config=/Applications/Postgres93.app/Contents/MacOS/bin/pg_config`
 
   if `which memcached`.strip.empty? then
     p 'Memcache not installed, installing now. BE SURE TO FOLLOW CAVEATS AND ADD TO LAUNCHCTL'
@@ -95,7 +92,6 @@ task :generate_env do
     env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
     env << 'NEW_RELIC_APP_NAME=CocoaPush' + "\n"
     env << "RACK_ENV=production\n"
-    env << 'DATABASE_URL=postgres://postgres@localhost/cocoapush' + "\n"
   end
 
   `heroku help config:push`
@@ -107,7 +103,6 @@ task :generate_env do
   p `heroku config:push -o`
   p `heroku config:set WEBSERVICE_URL=#{HEROKU_WEBSERVICE_URL}`
   p `heroku config:unset MEMCACHE_SERVERS`
-  p `heroku config:unset DATABASE_URL`
 
 end
 

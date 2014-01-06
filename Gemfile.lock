@@ -32,10 +32,9 @@ GEM
       tzinfo (~> 0.3.29)
     moped (1.5.1)
     multi_json (1.8.2)
-    newrelic_rpm (3.7.1.180)
+    newrelic_rpm (3.7.1.182)
     notify (0.5.2)
     origin (1.1.0)
-    pg (0.17.1)
     puma (2.7.1)
       rack (>= 1.1, < 2.0)
     rack (1.5.2)
@@ -253,10 +252,6 @@ GEM
     rubysl-yaml (2.0.4)
     rubysl-zlib (2.0.1)
     rubyzip (1.1.0)
-    sequel (4.5.0)
-    sequel_pg (1.6.8)
-      pg (>= 0.8.0)
-      sequel (>= 3.39.0)
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -275,13 +270,10 @@ DEPENDENCIES
   mongo
   mongoid
   newrelic_rpm
-  pg
   puma
   rack-cache
   rake
   rubysl
   rubysl-json
   rubyzip
-  sequel
-  sequel_pg
   sinatra
