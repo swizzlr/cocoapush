@@ -3,8 +3,16 @@ require 'sinatra/base'
 require 'json'
 
 require 'mongo'
-Mongo_Client = Mongo::MongoClient.new("localhost", 27017, :pool_size => 50, :pool_timeout => 5)
-DB = Mongo_Client.db('cocoapush')
+require 'uri'
+
+ENV['MONGODB_URI'] = ENV['MONGOHQ_URL']
+db_name = ENV['MONGODB_URI'].path.gsub(/^\//, '') rescue nil
+
+Mongo_Client = Mongo::MongoClient.new(:pool_size => 50, :pool_timeout => 5)
+DB = Mongo_Client.db(db_name || 'cocoapush')
+
+p "Connected to Mongo server: #{Mongo_Client.host}, using DB: #{DB.name}"
+
 Users = DB.collection('users')
 
 class CocoaPush < Sinatra::Base
@@ -25,6 +33,7 @@ class CocoaPush < Sinatra::Base
 
   post "/github-webhook" do
     # make a webhook happen
+    p request.body.read
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/pushPackages/#{WEBSITE_PUSH_ID}" do
@@ -40,14 +49,14 @@ class CocoaPush < Sinatra::Base
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #register device token for user ID
     Users.insert( {
-      device_token: params[:device_token]
-    } )
+      _id: params[:device_token]
+    } ) rescue nil
   end
 
   delete "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #unregister device token and delete user ID
     Users.remove( {
-      device_token: params[:device_token]
+      _id: params[:device_token]
     } )
   end
 
@@ -61,11 +70,13 @@ class CocoaPush < Sinatra::Base
   get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
     result = Users.find_one( { device_token: params[:device_token] } )
     result[:settings] unless result == nil
-
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
-    Users.update( { device_token: params[:device_token] }, { settings: request.body.read } )
+    Users.update(
+      { _id: params[:device_token] },
+      { settings: request.body.read }
+    )
   end
 
   def validate_incoming_json_settings(str)
