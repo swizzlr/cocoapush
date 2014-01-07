@@ -14,7 +14,8 @@ gem 'memcachier'
 
 gem 'mongo'
 gem 'bson_ext'
-gem 'mongoid'
+
+gem 'houston'
 
 group :development do
   gem 'kicker'
