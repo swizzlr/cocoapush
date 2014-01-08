@@ -80,13 +80,16 @@ task :flush do
   Dalli::Client.new.flush_all
 end
 
+desc 'Convert p12 key to pem format for push notification signing and pushpackage signing. Pass in password as argument.'
+task :convert, :password do |t, args|
+  require 'shellwords'
+  Process.exec p "echo #{args.password.shellescape}|openssl pkcs12 -passin stdin -in certs/web.org.cocoapods.push.p12 -out certs/web.org.cocoapods.push-combined.pem -nodes -clcerts"
+end
+
 desc 'Generate .env file from private keys and sync to heroku'
 task :generate_env do
   File.open '.env', 'w' do |env|
-    env << 'SSL_KEY=' + File.read('certs/org.cocoadocs.push-key.pem').escape + "\n"
-    env << 'SSL_CERT=' + File.read('certs/org.cocoadocs.push-key.pem').escape + "\n"
-    env << 'APPLE_KEY=' + File.read('certs/web.org.cocoapods.push-key.pem').escape + "\n"
-    env << 'APPLE_CERT=' + File.read('certs/web.org.cocoapods.push-cert.pem').escape + "\n"
+    env << 'APPLE_KEY_CERT=' + File.read('certs/web.org.cocoapods.push-combined.pem').escape + "\n"
     env << 'PORT=' + 9578.to_s + "\n"
     env << 'WEBSERVICE_URL=' + 'https://localhost:9578/push' + "\n"
     env << 'MEMCACHE_SERVERS=' + 'localhost:11211' + "\n"
@@ -110,7 +113,7 @@ desc 'Watch for changes and restart server when necessary.'
 task :kick => 'kick:kicker'
 
 namespace :kick do
-  lockfile_name = '.server_running_lockfile'
+  Lockfile_name = '.server_running_lockfile'
 
   task :kicker => :run_or_restart_server do
     puts 'Starting kicker'
@@ -135,22 +138,11 @@ task :run => 'run:development'
 
 namespace :run do
   task :generate_keys_from_env do
-    unless File.exists? 'certs/org.cocoadocs.push-key.pem'
-      p 'Generating SSL keyfile'
-      File.open 'certs/org.cocoadocs.push-key.pem', 'w' do |file|
-        p 'Loading key...'
-        key = ENV['SSL_KEY'].unescape
-        p key
-        file << key
-      end
-    end
-
-    unless File.exists? 'certs/web.org.cocoapods.push-key.pem'
+    unless File.exists? 'certs/web.org.cocoapods.push-combined.pem'
       p 'Generating APNS keyfile'
-      File.open 'certs/web.org.cocoapods.push-key.pem', 'w' do |file|
-        p 'Loading key...'
-        key = ENV['APPLE_KEY'].unescape
-        p key
+      File.open 'certs/web.org.cocoapods.push-combined.pem', 'w' do |file|
+        p 'Writing combined keyfile to file.'
+        key = ENV['APPLE_KEY_CERT'].unescape
         file << key
       end
     end
@@ -164,9 +156,12 @@ namespace :run do
 
   desc 'Start server with SSL and dev environment'
   task :development => :generate_keys_from_env do
-    Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/org.cocoadocs.push-key.pem'}&cert=#{File.expand_path './certs/org.cocoadocs.push-cert.pem'}\'"
+    abort
+    # this does not work for some reason
+    #Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/org.cocoadocs.push-key.pem'}&cert=#{File.expand_path './certs/org.cocoadocs.push-cert.pem'}\'"
   end
 
+  desc 'Start server without SSL in dev environment'
   task :dev_no_ssl do
     Process.exec p "bundle exec puma --environment development -p #{get_port}"
   end
@@ -211,7 +206,7 @@ namespace :pushpackage do
       manifest = Hash.new
       # create manifest hash
       file_paths = Dir['**/*']
-      file_paths.delete_if { |path| Dir.exists? path || path == 'signature' || path == '*.proto' }
+      file_paths.delete_if { |path| Dir.exists? path or path == "signature" }
       file_paths.each do |filename|
         digest = OpenSSL::Digest::SHA1.new(File.read(filename))
         manifest[filename] = digest.to_s
@@ -233,8 +228,8 @@ namespace :pushpackage do
 
     # get the signing objects
     Dir.chdir 'certs' do |dir|
-      private_key = OpenSSL::PKey::RSA.new File.read('web.org.cocoapods.push-key.pem')
-      certificate = OpenSSL::X509::Certificate.new File.read('web.org.cocoapods.push-cert.pem')
+      private_key = OpenSSL::PKey::RSA.new File.read('web.org.cocoapods.push-combined.pem')
+      certificate = OpenSSL::X509::Certificate.new File.read('web.org.cocoapods.push-combined.pem')
     end
 
     Dir.chdir 'CocoaPods.pushpackage' do |dir|
@@ -251,13 +246,13 @@ namespace :pushpackage do
   desc 'Zip pushpackage folder'
   task :zip => [:website, :manifest, :sign] do
     require 'zip'
-
-    p 'Regenerating pushpackage'
-
     if File.exists?('CocoaPods.pushpackage.zip') then
-      p 'Deleting package'
+      p 'Deleting old package'
       File.delete('CocoaPods.pushpackage.zip')
     end
+
+    p 'Writing pushpackage'
+
     Zip::File.open('CocoaPods.pushpackage.zip', Zip::File::CREATE) do |package|
       Dir.chdir 'CocoaPods.pushpackage' do |dir|
         Dir['**/*'].each { |file| package.add file, File.expand_path(file) unless Dir.exists? file }
