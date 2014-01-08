@@ -82,6 +82,7 @@ end
 
 desc 'Convert p12 key to pem format for push notification signing and pushpackage signing. Pass in password as argument.'
 task :convert, :password do |t, args|
+  raise NeedsPassword if args.password.nil?
   require 'shellwords'
   Process.exec p "echo #{args.password.shellescape}|openssl pkcs12 -passin stdin -in certs/web.org.cocoapods.push.p12 -out certs/web.org.cocoapods.push-combined.pem -nodes -clcerts"
 end
