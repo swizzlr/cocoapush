@@ -4,6 +4,7 @@ ruby '2.1.0', :engine => "rbx", :engine_version => "2.2.3"
 
 gem 'rubysl'
 gem 'rubysl-json'
+gem 'rake'
 
 gem 'puma'
 gem 'sinatra'
@@ -19,7 +20,6 @@ gem 'houston'
 
 group :development do
   gem 'kicker'
-  gem 'rake'
 end
 
 gem 'newrelic_rpm'
