@@ -1,7 +1,4 @@
-certs/*key*
-certs/*.p12
 certs/*combined*
-#keep certificates in public repo for reasons of transparency
 **/manifest.json
 **/signature
 **/website.json
