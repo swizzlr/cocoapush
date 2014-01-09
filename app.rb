@@ -46,8 +46,14 @@ class CocoaPush < Sinatra::Base
     pods.each do |pod|
       #create notification
       #grocer notification goes here
-      Pods.find_one( { _id: pod }, { users: true, _id: false } )['users'].each do |device_token|
-        # set the device token and flush it down the tubes
+      p "Pushing notifications for pod #{pod}"
+      begin
+        Pods.find_one( { _id: pod }, { fields: { users: 1, _id: 0 } } )['users']
+        .each do |device_token|
+          # set the device token and flush it down the tubes
+        end
+      rescue NoMethodError
+        p "No one is interested in #{pod}!"
       end
     end
   end
@@ -110,11 +116,12 @@ class CocoaPush < Sinatra::Base
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
-    (req = JSON.parse(request.body.read)['pods']) rescue return [400, 'Invalid JSON']
-    pods = req['pods'] rescue nil
+    (req = JSON.parse(request.body.read)) rescue return [400, 'Invalid JSON']
+    pods = req["pods"] rescue nil
     is_registered = Users.find_one( { _id: params[:device_token] }, { fields: { settings: 0 } } )
     return [412, "This user has not yet been registered to the database. Who is this? What\'s your operating number?"] unless is_registered
     if pods
+      p 'updating pods'
       Users.update( #update settings on user side
         { _id: params[:device_token] },
         { settings: { pods: pods } }
@@ -126,6 +133,7 @@ class CocoaPush < Sinatra::Base
           { upsert: true } #create pod document if none matches selector
         )
       end
+      return 201
     end
     return 200
   end

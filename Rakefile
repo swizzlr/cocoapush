@@ -123,15 +123,15 @@ namespace :kick do
 
   task :run_or_restart_server do #all kicking logic is found in the rakefile. because reasons.
     puts 'Checking for running server...'
-    if File.exists?(lockfile_name)
+    if File.exists?(Lockfile_name)
       puts 'Killing server...'
-      Process.kill('KILL', File.read(lockfile_name).to_i) rescue nil
-      File.delete(lockfile_name)
+      Process.kill('KILL', File.read(Lockfile_name).to_i) rescue nil
+      File.delete(Lockfile_name)
     end
     puts 'Spawning rake task'
     pid = Process.spawn('rake run:dev_no_ssl', :out => STDOUT)
     Process.detach(pid)
-    File.open(lockfile_name, 'w') { |file| file << pid }
+    File.open(Lockfile_name, 'w') { |file| file << pid }
   end
 end
 
