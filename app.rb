@@ -34,7 +34,26 @@ class CocoaPush < Sinatra::Base
 
   post "/github-webhook" do
     # make a webhook happen
-    p request.body.read
+    payload = JSON.parse params[:payload]
+    pods = payload["commits"]
+      .map { |commit| commit["added"] }
+      .flatten
+      .map { |path| path[/(?<=[\/])[^\/]+?(?!\/)(?=\.podspec$)/] } #is there a file path class that can do this for me?
+      .uniq
+    p 'Podspecs added to the specs repo:'
+    p pods
+    # push out to the people!
+    pods.each do |pod|
+      #create notification
+      #grocer notification goes here
+      Pods.find_one( { _id: pod }, { users: true, _id: false } )['users'].each do |device_token|
+        # set the device token and flush it down the tubes
+      end
+    end
+  end
+
+  post "/test-webhook" do
+    call! env.merge('PATH_INFO' => '/github-webhook')
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/pushPackages/#{WEBSITE_PUSH_ID}" do
