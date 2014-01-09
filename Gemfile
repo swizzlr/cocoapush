@@ -16,7 +16,7 @@ gem 'memcachier'
 gem 'mongo'
 gem 'bson_ext'
 
-gem 'houston'
+gem 'grocer'
 
 group :development do
   gem 'kicker'
