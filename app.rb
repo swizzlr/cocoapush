@@ -29,7 +29,8 @@ class CocoaPush < Sinatra::Base
   configure :production do
     require 'newrelic_rpm'
   end
-
+  
+  enable :logging
   enable :threaded
   set :server, 'puma'
 
