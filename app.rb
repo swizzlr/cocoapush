@@ -2,6 +2,8 @@ require './helpers.rb'
 require 'sinatra/base'
 require 'json'
 
+# --- MongoDB stack initialization --- #
+
 require 'mongo'
 require 'uri'
 
@@ -15,6 +17,13 @@ p "Connected to Mongo server: #{Mongo_Client.host}, using DB: #{DB.name}"
 
 Users = DB.collection('users')
 Pods = DB.collection('pods')
+URLRoutes = DB.collection('url_routes')
+
+# --- Grocer connection initialization --- #
+
+require 'grocer'
+
+CocoaPusher = Grocer.pusher({ certificate: 'certs/web.org.cocoapods.push-combined.pem' })
 
 class CocoaPush < Sinatra::Base
   configure :production do
@@ -45,16 +54,43 @@ class CocoaPush < Sinatra::Base
     # push out to the people!
     pods.each do |pod|
       #create notification
-      #grocer notification goes here
+      pod_users = Pods.find_one({ _id: pod }, { fields: { users: 1, _id: 0 } })['users'] rescue nil
+      next if pod_users.nil?
+      notification = Grocer::SafariNotification.new ({
+        title: 'New Pod Available',
+        body: 'A pod you are interested in is available',
+        url_args: [CocoaPush.generate_route_for_pod(pod)]
+      })
       p "Pushing notifications for pod #{pod}"
-      begin
-        Pods.find_one( { _id: pod }, { fields: { users: 1, _id: 0 } } )['users']
-        .each do |device_token|
-          # set the device token and flush it down the tubes
-        end
-      rescue NoMethodError
-        p "No one is interested in #{pod}!"
+      pod_users.each do |device_token|
+        # set the device token and flush it down the tubes
+        notification.device_token = device_token
+        p "Pushing #{notification}"
+        CocoaPusher.push notification
       end
+    end
+  end
+
+  def self.generate_route_for_pod(pod, link = 'https://github.com/CocoaPods/Specs')
+    url_info = Pods.find_one( #this is not idiomatic
+        { _id: pod },
+        { fields: { users: 0, _id: 0} }
+    )['url_info']
+
+    if url_info # it may have been created already
+      return url_info['cocoapush_route'] if (url_info['link'] == link) #has the URL changed?
+    end
+
+    require 'securerandom'
+    begin
+      possible_route = SecureRandom.urlsafe_base64 6
+      URLRoutes.insert({_id: possible_route, pod: pod, link: link}) # we need to find a nice way of cleaning up old routes. background rake job, anyone? it'll be slow as they're not indexed.
+      Pods.update(
+          { _id: pod },
+          {"$set" => { url_info: { cocoapush_route: possible_route, link: link } }}
+      )
+    rescue Mongo::OperationFailure
+      retry # in case of route collision
     end
   end
 
