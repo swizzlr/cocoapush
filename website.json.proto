@@ -2,7 +2,7 @@
     "websiteName": "CocoaPods",
     "websitePushID": "web.org.cocoapods.push",
     "allowedDomains": ["http://localhost:4567"],
-    "urlFormatString": "http://%@",
+    "urlFormatString": "https://cocoapush.herokuapp.com/route/%@",
     "authenticationToken": "I<3LISALUEDDECKE",
     "webServiceURL": "https://localhost:3000/push"
 }

@@ -29,7 +29,7 @@ class CocoaPush < Sinatra::Base
   configure :production do
     require 'newrelic_rpm'
   end
-  
+
   enable :logging
   enable :threaded
   set :server, 'puma'
@@ -112,7 +112,7 @@ class CocoaPush < Sinatra::Base
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
     #register device token for user ID
     Users.insert( { _id: params[:device_token] } ) rescue return 200
-    return 201
+    return 200
   end
 
   delete "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/devices/:device_token/registrations/#{WEBSITE_PUSH_ID}" do
@@ -133,7 +133,7 @@ class CocoaPush < Sinatra::Base
         { multi: true } #enable update of multiple documents
       )
     end
-    return 204
+    return 200
   end
 
   post "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/log" do
@@ -146,7 +146,7 @@ class CocoaPush < Sinatra::Base
   get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
     result = Users.find_one( { _id: params[:device_token] } )['settings'] rescue nil
     if result
-      return JSON.generate(result)
+      return JSON.generate(result) unless result.empty?
     else
       return [404, 'User not registered.']
     end
