@@ -175,6 +175,13 @@ class CocoaPush < Sinatra::Base
     return 200
   end
 
+  get "/route/:route_hash" do
+    redirect to URLRoutes.find_one(
+        { _id: params[:route_hash]},
+        { fields: { _id: 0, link: 1 } }
+    )['link'] rescue return 404
+  end
+
   def validate_incoming_json_settings(str)
     json = JSON.parse str
     if (json.class == Hash)
