@@ -135,7 +135,7 @@ namespace :kick do
   end
 end
 
-task :run => 'run:development'
+task :run => 'run:dev_no_ssl'
 
 namespace :run do
   task :generate_keys_from_env do
@@ -163,7 +163,7 @@ namespace :run do
   end
 
   desc 'Start server without SSL in dev environment'
-  task :dev_no_ssl do
+  task :dev_no_ssl => [:generate_keys_from_env, :pushpackage] do
     Process.exec p "bundle exec puma --environment development -p #{get_port}"
   end
 
@@ -171,11 +171,6 @@ namespace :run do
   task :production => [:generate_keys_from_env, :pushpackage] do
     Process.exec p "bundle exec puma --environment production -t 25:200 -p #{get_port}"
   end
-end
-
-desc 'Run sequel connected either locally or remoteley'
-task :sequel do
-  Process.exec p "bundle exec sequel #{ENV['DATABASE_URL'] || 'postgres://swizzlr@localhost/cocoapush'}"
 end
 
 desc 'Fully regenerate push package and ensure caches are flushed'
