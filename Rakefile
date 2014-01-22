@@ -157,9 +157,9 @@ namespace :run do
 
   desc 'Start server with SSL and dev environment'
   task :development => :generate_keys_from_env do
-    abort
+    #abort
     # this does not work for some reason
-    #Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/org.cocoadocs.push-key.pem'}&cert=#{File.expand_path './certs/org.cocoadocs.push-cert.pem'}\'"
+    Process.exec p "bundle exec puma --environment development -b \'ssl://localhost:#{get_port}?key=#{File.expand_path './certs/insec_local_ssl.pem'}&cert=#{File.expand_path './certs/insec_local_ssl.pem'}\'"
   end
 
   desc 'Start server without SSL in dev environment'
