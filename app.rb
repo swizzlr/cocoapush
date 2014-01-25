@@ -30,7 +30,7 @@ class CocoaPush < Sinatra::Base
 
   configure :production do
     require 'newrelic_rpm'
-    @@all_pod_pushing_is_enabled = false;
+    #@@all_pod_pushing_is_enabled = false; #enabled in production for now only because who wants to add an extra environment, but super expensive
   end
 
   enable :logging
@@ -67,8 +67,8 @@ class CocoaPush < Sinatra::Base
 
         Users.find({ 'settings.pods' => LML_DEBUG_WANTS_ALL_PODS }, { fields: { settings: 0 } }).each do |id_hash|
           next if id_hash.nil?
-          p 'Pushing to overenthusiastic device token ' + id_hash[:id]
-          notification.device_token = id_hash[:id]
+          p 'Pushing to overenthusiastic device token ' + id_hash['_id']
+          notification.device_token = id_hash['_id']
           CocoaPusher.push notification
         end
       end
@@ -92,10 +92,14 @@ class CocoaPush < Sinatra::Base
   end
 
   def self.generate_route_for_pod(pod, link = 'https://github.com/CocoaPods/Specs')
-    url_info = Pods.find_one( #this is not idiomatic
-        { _id: pod },
-        { fields: { users: 0, _id: 0} }
-    )['url_info'] #what if pod does not exist?
+    begin
+      url_info = Pods.find_one( #this is not idiomatic
+          { _id: pod },
+          { fields: { users: 0, _id: 0} }
+      )['url_info']
+    rescue NoMethodError
+      return nil
+    end #what if pod does not exist? uh, we'll have to just return nothing
 
     if url_info # it may have been created already
       return url_info['cocoapush_route'] if (url_info['link'] == link) #has the URL changed?
