@@ -26,8 +26,11 @@ require 'grocer'
 CocoaPusher = Grocer.pusher({ certificate: 'certs/web.org.cocoapods.push-combined.pem' })
 
 class CocoaPush < Sinatra::Base
+  @@all_pod_pushing_is_enabled = true;
+
   configure :production do
     require 'newrelic_rpm'
+    @@all_pod_pushing_is_enabled = false;
   end
 
   enable :logging
@@ -54,6 +57,22 @@ class CocoaPush < Sinatra::Base
     p pods
     # push out to the people!
     pods.each do |pod|
+      if (@@all_pod_pushing_is_enabled == true)
+        p "Pushing #{pod} to all users who have registered for all pods"
+        notification = Grocer::SafariNotification.new ({
+          title: 'New Pod Available',
+          body: 'A pod you are interested in is available',
+          url_args: [CocoaPush.generate_route_for_pod(pod)]
+        })
+
+        Users.find({ 'settings.pods' => LML_DEBUG_WANTS_ALL_PODS }, { fields: { settings: 0 } }).each do |id_hash|
+          next if id_hash.nil?
+          p 'Pushing to overenthusiastic device token ' + id_hash[:id]
+          notification.device_token = id_hash[:id]
+          CocoaPusher.push notification
+        end
+      end
+
       #create notification
       pod_users = Pods.find_one({ _id: pod }, { fields: { users: 1, _id: 0 } })['users'] rescue nil
       next if pod_users.nil?
@@ -76,7 +95,7 @@ class CocoaPush < Sinatra::Base
     url_info = Pods.find_one( #this is not idiomatic
         { _id: pod },
         { fields: { users: 0, _id: 0} }
-    )['url_info']
+    )['url_info'] #what if pod does not exist?
 
     if url_info # it may have been created already
       return url_info['cocoapush_route'] if (url_info['link'] == link) #has the URL changed?
