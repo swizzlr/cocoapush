@@ -148,7 +148,7 @@ class CocoaPush < Sinatra::Base
     if result
       return JSON.generate(result) unless result.empty?
     else
-      return [404, 'User not registered.']
+      return [404, 'User not registered or has no settings']
     end
   end
 
