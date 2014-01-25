@@ -129,13 +129,13 @@ namespace :kick do
       File.delete(Lockfile_name)
     end
     puts 'Spawning rake task'
-    pid = Process.spawn('rake run:dev_no_ssl', :out => STDOUT)
+    pid = Process.spawn('rake run', :out => STDOUT)
     Process.detach(pid)
     File.open(Lockfile_name, 'w') { |file| file << pid }
   end
 end
 
-task :run => 'run:dev_no_ssl'
+task :run => 'run:development'
 
 namespace :run do
   task :generate_keys_from_env do
