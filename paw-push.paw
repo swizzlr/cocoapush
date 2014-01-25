@@ -5,7 +5,7 @@
     <databaseInfo>
         <version>134481920</version>
         <UUID>98E5FD04-45D1-4E4B-ACF5-F56D10A4B625</UUID>
-        <nextObjectID>146</nextObjectID>
+        <nextObjectID>149</nextObjectID>
         <metadata>
             <plist version="1.0">
                 <dict>
@@ -83,7 +83,7 @@
     <object type="LMENVIRONMENTVARIABLE" id="z107">
         <attribute name="uuid" type="string">A470C036-4634-43A5-827D-C0454D3963C2</attribute>
         <attribute name="name" type="string">$HOST</attribute>
-        <relationship name="values" type="0/0" destination="LMENVIRONMENTVARIABLEVALUE" idrefs="z113 z116 z108 z111"></relationship>
+        <relationship name="values" type="0/0" destination="LMENVIRONMENTVARIABLEVALUE" idrefs="z149 z113 z116 z108 z111"></relationship>
     </object>
     <object type="LMENVIRONMENTVARIABLEVALUE" id="z108">
         <attribute name="value" type="string">http://cocoapush.herokuapp.com</attribute>
@@ -244,12 +244,12 @@
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">POST</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="body" type="string">["{\\n\\t\\"pods\\" : [\\n\\t\\t\\"AFNetworking\\",\\n\\t\\t\\"ReactiveCocoa\\",\\n\\t\\t\\"boxBlur\\",\\n\\t\\t\\"DLWidgetMenu\\"\\n\\t]\\n}"]</attribute>
+        <attribute name="body" type="string">["{\\n\\t\\"pods\\" : [\\n\\t\\t\\"AFNetworking\\",\\n\\t\\t\\"ReactiveCocoa\\",\\n\\t\\t\\"boxBlur\\",\\n\\t\\t\\"DLWidgetMenu\\",\\n\\t\\t\\"LMLIWantEverySinglePod\\"\\n\\t]\\n}"]</attribute>
         <attribute name="order" type="int64">1</attribute>
         <attribute name="name" type="string">Update Settings</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM" idrefs="z126"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z131 z128"></relationship>
+        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z128 z131"></relationship>
     </object>
     <object type="LMREQUEST" id="z133">
         <attribute name="uuid" type="string">0AA77DE2-141E-4D32-9A66-4524EEA257A3</attribute>
@@ -334,7 +334,7 @@
     <object type="LMENVIRONMENTVARIABLE" id="z141">
         <attribute name="uuid" type="string">C670DC45-4734-497C-978B-BE87A9505A54</attribute>
         <attribute name="name" type="string">$DEVICE_TOKEN</attribute>
-        <relationship name="values" type="0/0" destination="LMENVIRONMENTVARIABLEVALUE" idrefs="z139 z140 z142 z143"></relationship>
+        <relationship name="values" type="0/0" destination="LMENVIRONMENTVARIABLEVALUE" idrefs="z147 z143 z142 z139 z140"></relationship>
     </object>
     <object type="LMENVIRONMENTVARIABLEVALUE" id="z142">
         <attribute name="value" type="string">DEVICE_TOKEN_GOES_HERE</attribute>
@@ -379,5 +379,19 @@
         <relationship name="bodyparameters" type="0/0" destination="LMKEYVALUE"></relationship>
         <relationship name="headers" type="0/0" destination="LMKEYVALUE"></relationship>
         <relationship name="urlparameters" type="0/0" destination="LMKEYVALUE"></relationship>
+    </object>
+    <object type="LMENVIRONMENTVARIABLEVALUE" id="z147">
+        <attribute name="value" type="string">1E99885BD39002BB656B30C0A25A2263FB39589BE754F274F007C82C09C26023</attribute>
+        <relationship name="environment" type="1/1" destination="LMENVIRONMENT" idrefs="z148"></relationship>
+        <relationship name="variable" type="1/1" destination="LMENVIRONMENTVARIABLE" idrefs="z141"></relationship>
+    </object>
+    <object type="LMENVIRONMENT" id="z148">
+        <attribute name="name" type="string">Localhost Swizzair</attribute>
+        <relationship name="variablesvalues" type="0/0" destination="LMENVIRONMENTVARIABLEVALUE" idrefs="z147 z149"></relationship>
+    </object>
+    <object type="LMENVIRONMENTVARIABLEVALUE" id="z149">
+        <attribute name="value" type="string">https://localhost:3000</attribute>
+        <relationship name="environment" type="1/1" destination="LMENVIRONMENT" idrefs="z148"></relationship>
+        <relationship name="variable" type="1/1" destination="LMENVIRONMENTVARIABLE" idrefs="z107"></relationship>
     </object>
 </database>
