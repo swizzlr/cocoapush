@@ -23,7 +23,7 @@ URLRoutes = DB.collection('url_routes')
 
 require 'grocer'
 
-CocoaPusher = Grocer.pusher({ certificate: 'certs/web.org.cocoapods.push-combined.pem' })
+CocoaPusher = Grocer.pusher({ certificate: 'certs/web.org.cocoapods.push-combined.pem', gateway: "gateway.push.apple.com" })
 
 class CocoaPush < Sinatra::Base
   @@all_pod_pushing_is_enabled = true;
