@@ -1,3 +1,5 @@
+[![Code Climate](https://codeclimate.com/github/swizzlr/cocoapush.png)](https://codeclimate.com/github/swizzlr/cocoapush)
+
 #Serves Safari Push Notifications for CocoaPods Users
 
 ##Getting started
