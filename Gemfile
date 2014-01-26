@@ -9,6 +9,7 @@ gem 'rake'
 gem 'puma'
 gem 'sinatra'
 gem 'rack-cache'
+gem 'sinatra-cross_origin'
 
 gem 'dalli'
 gem 'memcachier'
