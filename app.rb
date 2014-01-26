@@ -1,5 +1,6 @@
 require './helpers.rb'
 require 'sinatra/base'
+require 'sinatra/cross_origin'
 require 'json'
 
 # --- MongoDB stack initialization --- #
@@ -26,6 +27,9 @@ require 'grocer'
 CocoaPusher = Grocer.pusher({ certificate: 'certs/web.org.cocoapods.push-combined.pem', gateway: "gateway.push.apple.com" })
 
 class CocoaPush < Sinatra::Base
+  register Sinatra::CrossOrigin
+  set :protection, :origin_whitelist => ['http://localhost:4567']
+
   @@all_pod_pushing_is_enabled = true;
 
   configure :production do
@@ -164,6 +168,17 @@ class CocoaPush < Sinatra::Base
     logger.warn "Got #{errors.count} errors from Safari:"
     errors.each { |error| logger.warn error }
     return 202
+  end
+
+  after "*/settingsForDeviceToken/*" do
+    cross_origin :allow_origin => 'http://localhost:4567',
+    :allow_methods => [:get, :post],
+    :allow_credentials => false,
+    :max_age => "10"
+  end
+
+  options "*/settingsForDeviceToken/*" do
+    # stub so CORS won't 404 - cross_origin gem really ought to do this eh?
   end
 
   get "/#{NOTIF_EXTENSION_SUBROUTE}/#{VERSION}/settingsForDeviceToken/:device_token" do
